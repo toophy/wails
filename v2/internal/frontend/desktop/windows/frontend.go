@@ -488,6 +488,14 @@ func (f *Frontend) setupChromium() {
 		chromium.AdditionalBrowserArgs = append(chromium.AdditionalBrowserArgs, arg)
 	}
 
+	// Enable WebView2 CDP remote debugging port for MCP control (Windows only)
+	// Can be customized via WAILS_CDP_PORT environment variable, default is 9222
+	cdpPort := os.Getenv("WAILS_CDP_PORT")
+	if cdpPort == "" {
+		cdpPort = "9222"
+	}
+	chromium.AdditionalBrowserArgs = append(chromium.AdditionalBrowserArgs, fmt.Sprintf("--remote-debugging-port=%s", cdpPort))
+
 	if f.frontendOptions.DragAndDrop != nil && f.frontendOptions.DragAndDrop.DisableWebViewDrop {
 		if err := chromium.AllowExternalDrag(false); err != nil {
 			f.logger.Warning("WebView failed to set AllowExternalDrag to false!")
